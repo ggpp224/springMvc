@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.standard.TeachPlanMapper">
+	<resultMap id="teachPlan" type="TeachPlan" >
+		<id property="id" column="ID" />
+		<result property="teachPlanName" column="TEACH_PLAN_NAME" />
+		<result property="teachPlanCode" column="TEACH_PLAN_CODE" />
+		<result property="major" column="MAJOR" />
+		<result property="trainLevel" column="TRAIN_LEVEL" />
+		<result property="eduSystem" column="EDU_SYSTEM" />
+		<result property="eduSystemType" column="EDU_SYSTEM_TYPE" />
+		<result property="learnLife" column="LEARN_LIFE" />
+		<result property="minimumCredit" column="MINIMUM_CREDIT" />
+		<result property="requiredCredit" column="REQUIRED_CREDIT" />
+		<result property="electiveCredit" column="ELECTIVE_CREDIT" />
+		<result property="degreeAwarded" column="DEGREE_AWARDED" />
+		<result property="currentSemesterCode" column="CURRENT_SEMESTER_CODE" />
+		<result property="state" column="STATE" />
+		<result property="updatetime" column="UPDATETIME" />
+		<result property="createtime" column="CREATETIME" />
+		
+		<result property="beginSemester" column="BEGIN_SEMESTER" />
+		<result property="endSemester" column="END_SEMESTER" />
+		<result property="creator" column="CREATOR" />
+		<result property="isRemove" column="IS_REMOVE" />
+		<result property="projectId" column="PROJECT_ID" />
+		
+  	</resultMap>
+  
+  	<select id="getTeachPlan" resultMap="teachPlan" >
+	    select 
+	    	ID,
+	    	TEACH_PLAN_NAME,
+	    	TEACH_PLAN_CODE,
+	    	MAJOR,
+	    	TRAIN_LEVEL,
+	    	EDU_SYSTEM,
+	    	EDU_SYSTEM_TYPE,
+	    	LEARN_LIFE,
+	    	MINIMUM_CREDIT,
+	    	REQUIRED_CREDIT,
+	    	ELECTIVE_CREDIT,
+	    	DEGREE_AWARDED,
+	    	CURRENT_SEMESTER_CODE,
+	    	STATE,
+	    	UPDATETIME,
+	    	CREATETIME,
+	    	CREATOR,
+	    	IS_REMOVE,
+	    	PROJECT_ID
+	    from TEACH_PLAN 
+	    where id=#{id}
+	</select>
+	
+	<select id="getTeachPlansByIds" parameterType="string"   resultMap="teachPlan">
+	    select 
+	    	ID,
+	    	TEACH_PLAN_NAME,
+	    	TEACH_PLAN_CODE,
+	    	MAJOR,
+	    	TRAIN_LEVEL,
+	    	EDU_SYSTEM,
+	    	EDU_SYSTEM_TYPE,
+	    	LEARN_LIFE,
+	    	MINIMUM_CREDIT,
+	    	BEGIN_SEMESTER,
+	    	END_SEMESTER,
+	    	REQUIRED_CREDIT,
+	    	ELECTIVE_CREDIT,
+	    	DEGREE_AWARDED,
+	    	CURRENT_SEMESTER_CODE,
+	    	STATE,
+	    	UPDATETIME,
+	    	CREATETIME,
+	    	CREATOR,
+	    	IS_REMOVE,
+	    	PROJECT_ID
+	    from TEACH_PLAN 
+	    WHERE ID  in 
+	      <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		
+	</select>
+	 
+ 
+  <select id="findTeachPlan" parameterType="map" resultType="map"> 
+
+    select 
+    	ID AS "id" ,
+    	TEACH_PLAN_NAME AS "teachPlanName",
+    	TEACH_PLAN_CODE AS "teachPlanCode",
+    	MAJOR AS "major",
+    	BEGIN_SEMESTER AS "beginSemester",
+    	END_SEMESTER AS "endSemester",
+    	TRAIN_LEVEL AS "trainLevel",
+    	EDU_SYSTEM AS "eduSystem",
+    	PROJECT_ID as "projectId",
+    	(SELECT PM.PRO_NAME FROM pro_main PM WHERE tp.PROJECT_ID=PM.ID) AS "projectName",
+    	EDU_SYSTEM_TYPE AS "eduSystemType",
+    	LEARN_LIFE AS "learnLife",
+    	MINIMUM_CREDIT AS "minimumCredit",
+    	REQUIRED_CREDIT AS "requiredCredit",
+    	ELECTIVE_CREDIT AS "electiveCredit",
+    	DEGREE_AWARDED AS "degreeAwarded",
+    	CURRENT_SEMESTER_CODE AS "currentSemesterCode",
+    	STATE AS "state",
+    	UPDATETIME AS "updatetime",
+    	CREATETIME AS "createtime",
+    	CREATOR AS "creator",
+    	IS_REMOVE AS "isRemove",
+    	(SELECT COUNT(1) FROM TEACHPLAN_COURSE TC WHERE TC.TEACHPLAN_ID=tp.id and TC.IS_REMOVE=0) AS "courseNumber",
+    	(SELECT S.SEMESTER_NAME FROM SEMESTER S WHERE S.ID=CURRENT_SEMESTER_CODE)  AS "currentSemesterName",
+    	(SELECT SM.NAME FROM SYS_MAJOR SM WHERE SM.ID=tp.MAJOR) AS "majorName"
+    from TEACH_PLAN tp
+    <where>
+            IS_REMOVE=0
+    		<if test="teachPlanName != null">
+    			AND TEACH_PLAN_NAME like '%${teachPlanName}%' 
+			</if>
+    		<if test="teachPlanCode != null">
+    			AND TEACH_PLAN_CODE = #{teachPlanCode}
+			</if>
+    		<if test="major != null">
+    			AND MAJOR = #{major}
+			</if>
+    		<if test="trainLevel != null">
+    			AND TRAIN_LEVEL = #{trainLevel}
+			</if>
+    		<if test="eduSystem != null">
+    			AND EDU_SYSTEM = #{eduSystem}
+			</if>
+    		<if test="eduSystemType != null">
+    			AND EDU_SYSTEM_TYPE = #{eduSystemType}
+			</if>
+    		<if test="learnLife != null">
+    			AND LEARN_LIFE = #{learnLife}
+			</if>
+    		<if test="minimumCredit != null">
+    			AND MINIMUM_CREDIT = #{minimumCredit}
+			</if>
+    		<if test="requiredCredit != null">
+    			AND REQUIRED_CREDIT = #{requiredCredit}
+			</if>
+    		<if test="electiveCredit != null">
+    			AND ELECTIVE_CREDIT = #{electiveCredit}
+			</if>
+    		<if test="degreeAwarded != null">
+    			AND DEGREE_AWARDED = #{degreeAwarded}
+			</if>
+    		<if test="currentSemesterCode != null">
+    			AND CURRENT_SEMESTER_CODE = #{currentSemesterCode}
+			</if>
+    		<if test="state ==0">
+    			AND (  (select ss.seq from semester ss where ss.id=BEGIN_SEMESTER)  &gt; (select s.seq from semester s where s.currented=1))
+			</if>
+			
+			<if test="state ==1">
+			    <![CDATA[
+    			AND (  (select ss.seq from semester ss where ss.id=BEGIN_SEMESTER)  <= (select s.seq from semester s where s.currented=1)
+    			AND (select ss.seq from semester ss where ss.id=END_SEMESTER)  >= (select s.seq from semester s where s.currented=1)
+    			)
+			  ]]>
+			</if>
+			
+			<if test="state ==2">
+			 <![CDATA[
+    			AND (  (select ss.seq from semester ss where ss.id=END_SEMESTER)  < (select s.seq from semester s where s.currented=1))
+			  ]]>
+			</if>
+			
+    		<if test="updatetime != null">
+    			AND UPDATETIME = #{updatetime}
+			</if>
+    		<if test="createtime != null">
+    			AND CREATETIME = #{createtime}
+			</if>
+    		<if test="creator != null">
+    			AND CREATOR = #{creator}
+			</if>
+			<if test="projectId != null">
+    			AND PROJECT_ID = #{projectId}
+			</if>
+    		
+    </where>
+     
+  </select>
+
+   <select id="getAllTeachPlan" resultMap="teachPlan">
+    select 
+    	ID,
+    	TEACH_PLAN_NAME,
+    	TEACH_PLAN_CODE,
+    	MAJOR,
+    	TRAIN_LEVEL,
+    	EDU_SYSTEM,
+    	EDU_SYSTEM_TYPE,
+    	LEARN_LIFE,
+    	MINIMUM_CREDIT,
+    	REQUIRED_CREDIT,
+    	ELECTIVE_CREDIT,
+    	DEGREE_AWARDED,
+    	CURRENT_SEMESTER_CODE,
+    	STATE,
+    	UPDATETIME,
+    	CREATETIME,
+    	CREATOR,
+    	IS_REMOVE,
+    	PROJECT_ID
+    from TEACH_PLAN
+  </select>
+  
+  <delete id="deleteTeachPlan" >
+    delete from TEACH_PLAN where id=#{id}
+  </delete>
+  
+  	<delete id="deleteTeachPlanBatch" parameterType="map">
+		delete from TEACH_PLAN
+		<where>
+	    		<if test="teachPlanName != null">
+	    			AND TEACH_PLAN_NAME = #{teachPlanName}
+				</if>
+	    		<if test="teachPlanCode != null">
+	    			AND TEACH_PLAN_CODE = #{teachPlanCode}
+				</if>
+	    		<if test="major != null">
+	    			AND MAJOR = #{major}
+				</if>
+	    		<if test="trainLevel != null">
+	    			AND TRAIN_LEVEL = #{trainLevel}
+				</if>
+	    		<if test="eduSystem != null">
+	    			AND EDU_SYSTEM = #{eduSystem}
+				</if>
+	    		<if test="eduSystemType != null">
+	    			AND EDU_SYSTEM_TYPE = #{eduSystemType}
+				</if>
+	    		<if test="learnLife != null">
+	    			AND LEARN_LIFE = #{learnLife}
+				</if>
+	    		<if test="minimumCredit != null">
+	    			AND MINIMUM_CREDIT = #{minimumCredit}
+				</if>
+	    		<if test="requiredCredit != null">
+	    			AND REQUIRED_CREDIT = #{requiredCredit}
+				</if>
+	    		<if test="electiveCredit != null">
+	    			AND ELECTIVE_CREDIT = #{electiveCredit}
+				</if>
+	    		<if test="degreeAwarded != null">
+	    			AND DEGREE_AWARDED = #{degreeAwarded}
+				</if>
+	    		<if test="currentSemesterCode != null">
+	    			AND CURRENT_SEMESTER_CODE = #{currentSemesterCode}
+				</if>
+	    		<if test="state != null">
+	    			AND STATE = #{state}
+				</if>
+	    		<if test="updatetime != null">
+	    			AND UPDATETIME = #{updatetime}
+				</if>
+	    		<if test="createtime != null">
+	    			AND CREATETIME = #{createtime}
+				</if>
+	    		<if test="creator != null">
+	    			AND CREATOR = #{creator}
+				</if>
+	    		<if test="isRemove != null">
+	    			AND IS_REMOVE = #{isRemove}
+				</if>
+		</where>
+	</delete>
+
+	<delete id="deleteTeachPlanBatchByPks" parameterType="string">
+		delete from TEACH_PLAN where ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+  
+  <insert id="insertTeachPlan" >
+     insert into TEACH_PLAN (
+     <trim suffix="" suffixOverrides=",">
+		 <if test="id != null">
+	    		ID,
+	     </if>
+		 <if test="teachPlanName != null">
+	    		TEACH_PLAN_NAME,
+	     </if>
+		 <if test="teachPlanCode != null">
+	    		TEACH_PLAN_CODE,
+	     </if>
+		 <if test="major != null">
+	    		MAJOR,
+	     </if>
+		 <if test="trainLevel != null">
+	    		TRAIN_LEVEL,
+	     </if>
+		 <if test="eduSystem != null">
+	    		EDU_SYSTEM,
+	     </if>
+		 <if test="eduSystemType != null">
+	    		EDU_SYSTEM_TYPE,
+	     </if>
+		 <if test="learnLife != null">
+	    		LEARN_LIFE,
+	     </if>
+		 <if test="minimumCredit != null">
+	    		MINIMUM_CREDIT,
+	     </if>
+		 <if test="requiredCredit != null">
+	    		REQUIRED_CREDIT,
+	     </if>
+		 <if test="electiveCredit != null">
+	    		ELECTIVE_CREDIT,
+	     </if>
+		 <if test="degreeAwarded != null">
+	    		DEGREE_AWARDED,
+	     </if>
+
+	      <if test="beginSemester != null">
+	    		BEGIN_SEMESTER,
+	     </if>
+	      <if test="endSemester != null">
+	    		END_SEMESTER,
+	     </if>
+
+		 <if test="currentSemesterCode != null">
+	    		CURRENT_SEMESTER_CODE,
+	     </if>
+		 <if test="state != null">
+	    		STATE,
+	     </if>
+		 <if test="updatetime != null">
+	    		UPDATETIME,
+	     </if>
+		 <if test="createtime != null">
+	    		CREATETIME,
+	     </if>
+		 <if test="creator != null">
+	    		CREATOR,
+	     </if>
+		 <if test="isRemove != null">
+	    		IS_REMOVE,
+	     </if>
+	      <if test="projectId != null">
+	    		PROJECT_ID
+	     </if>
+      </trim>       
+    ) values(
+     <trim suffix="" suffixOverrides=",">
+		 <if test="id != null">
+	     #{id},
+	     </if>
+		 <if test="teachPlanName != null">
+	     #{teachPlanName},
+	     </if>
+		 <if test="teachPlanCode != null">
+	     #{teachPlanCode},
+	     </if>
+		 <if test="major != null">
+	     #{major},
+	     </if>
+		 <if test="trainLevel != null">
+	     #{trainLevel},
+	     </if>
+		 <if test="eduSystem != null">
+	     #{eduSystem},
+	     </if>
+		 <if test="eduSystemType != null">
+	     #{eduSystemType},
+	     </if>
+		 <if test="learnLife != null">
+	     #{learnLife},
+	     </if>
+		 <if test="minimumCredit != null">
+	     #{minimumCredit},
+	     </if>
+		 <if test="requiredCredit != null">
+	     #{requiredCredit},
+	     </if>
+		 <if test="electiveCredit != null">
+	     #{electiveCredit},
+	     </if>
+		 <if test="degreeAwarded != null">
+	     #{degreeAwarded},
+	     </if>
+	     
+	      <if test="beginSemester != null">
+	    		 #{beginSemester},
+	     </if>
+	      <if test="endSemester != null">
+	    		 #{endSemester},
+	     </if>
+	     
+		 <if test="currentSemesterCode != null">
+	     #{currentSemesterCode},
+	     </if>
+		 <if test="state != null">
+	     #{state},
+	     </if>
+		 <if test="updatetime != null">
+	     #{updatetime},
+	     </if>
+		 <if test="createtime != null">
+	     #{createtime},
+	     </if>
+		 <if test="creator != null">
+	     #{creator},
+	     </if>
+		 <if test="isRemove != null">
+	     #{isRemove},
+	     </if>
+	      <if test="projectId != null">
+	     #{projectId}
+	     </if>
+	    
+      </trim>
+    )
+  </insert>
+  
+  <update id="updateTeachPlan" >
+       update TEACH_PLAN
+    <set>
+    		<if test="teachPlanName != null">
+    			TEACH_PLAN_NAME=#{teachPlanName},
+    		</if>
+    		<if test="teachPlanCode != null">
+    			TEACH_PLAN_CODE=#{teachPlanCode},
+    		</if>
+    		<if test="major != null">
+    			MAJOR=#{major},
+    		</if>
+    		
+    		 <if test="beginSemester != null">
+	    		BEGIN_SEMESTER=#{beginSemester},
+	     </if>
+	      <if test="endSemester != null">
+	    		END_SEMESTER=#{endSemester},
+	     </if>
+    		
+    		<if test="trainLevel != null">
+    			TRAIN_LEVEL=#{trainLevel},
+    		</if>
+    		<if test="eduSystem != null">
+    			EDU_SYSTEM=#{eduSystem},
+    		</if>
+    		<if test="eduSystemType != null">
+    			EDU_SYSTEM_TYPE=#{eduSystemType},
+    		</if>
+    		<if test="learnLife != null">
+    			LEARN_LIFE=#{learnLife},
+    		</if>
+    		<if test="minimumCredit != null">
+    			MINIMUM_CREDIT=#{minimumCredit},
+    		</if>
+    		<if test="requiredCredit != null">
+    			REQUIRED_CREDIT=#{requiredCredit},
+    		</if>
+    		<if test="electiveCredit != null">
+    			ELECTIVE_CREDIT=#{electiveCredit},
+    		</if>
+    		<if test="degreeAwarded != null">
+    			DEGREE_AWARDED=#{degreeAwarded},
+    		</if>
+    		<if test="currentSemesterCode != null">
+    			CURRENT_SEMESTER_CODE=#{currentSemesterCode},
+    		</if>
+    		<if test="state != null">
+    			STATE=#{state},
+    		</if>
+    		<if test="updatetime != null">
+    			UPDATETIME=#{updatetime},
+    		</if>
+    		<if test="createtime != null">
+    			CREATETIME=#{createtime},
+    		</if>
+    		<if test="creator != null">
+    			CREATOR=#{creator},
+    		</if>
+    		<if test="isRemove != null">
+    			IS_REMOVE=#{isRemove},
+    		</if>
+    		<if test="projectId != null">
+    			PROJECT_ID=#{projectId}
+    		</if>
+    	
+    </set>
+    where id = #{id}
+  </update>
+</mapper>
